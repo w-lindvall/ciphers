@@ -67,9 +67,9 @@ def get_string(encrypt_or_decrypt, cipher):
     print('What would you like to {0}?'.format(encrypt_or_decrypt))
     # Prepares input for decrypting with Polybius Square cipher
     if cipher == 'polybius square' and encrypt_or_decrypt == 'decrypt':
-        print('(Only valid number pairs will be decrypted, '
-              'other characters will be part of decrypted message)')
-        string = input('> ')
+        string = input('(Only valid number pairs will be decrypted, '
+                       'other characters will be part of decrypted message)\n'
+                       '> ')
         # splits user input into list items
         string_blocks = string.split(' ')
         return string_blocks
@@ -117,6 +117,7 @@ def decrypt(string):
     elif cipher == 'polybius square':
         print('The decrypted message is \''
               + str(PolybiusSquare().decrypt(string)) + '\'')
+
 
 if __name__ == '__main__':
     encrypt_or_decrypt, cipher = welcome()

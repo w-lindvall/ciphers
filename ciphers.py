@@ -1,3 +1,6 @@
+import string
+
+
 class Cipher:
     """ Parent class of ciphers that raises error
     if subclass does not have an encrypt or decrypt method.
@@ -21,7 +24,7 @@ class Atbash(Cipher):
         """ Initializes an instance of the Atbash class
         and defines required variables."""
         super().__init__()
-        self.alphabet = list('abcdefghijklmnopqrstuvwxyz')
+        self.alphabet = list(string.ascii_lowercase)
         self.alphabet_reverse = self.alphabet[::-1]
         self.output = []
 
@@ -32,6 +35,7 @@ class Atbash(Cipher):
             try:
                 original_index = self.alphabet.index(letter.lower())
                 self.output.append(self.alphabet_reverse[original_index])
+            # appends non-letter character to output[]
             except ValueError:
                 self.output.append(letter)
         # joins list of output letters
@@ -58,11 +62,11 @@ class Keyword(Cipher):
         """ Initializes an instance of the Keyword class
         and defines required variables."""
         super().__init__()
-        print('Please enter the keyword you wish to use?\n'
-              '(Character duplicates and non-letter characters '
-              'will be ignored)')
-        self.keyword = input('> ').lower()
-        self.alphabet = list('abcdefghijklmnopqrstuvwxyz')
+        self.keyword = input('Please enter the keyword you wish to use\n'
+                             '(Character duplicates and non-letter characters '
+                             'will be ignored)\n'
+                             '> ').lower()
+        self.alphabet = list(string.ascii_lowercase)
         self.alphabet_modified = []
         self.output = []
 
@@ -70,8 +74,8 @@ class Keyword(Cipher):
         """ Encrypts user-defined message using the Keyword cipher."""
         for letter in self.keyword:
             # letter by letter places non-repeated letters of keyword into list
-            if letter.lower() in self.alphabet \
-                    and letter.lower() not in self.alphabet_modified:
+            if (letter.lower() in self.alphabet
+                    and letter.lower() not in self.alphabet_modified):
                 self.alphabet_modified.append(letter)
         for letter in self.alphabet:
             # places non-repeated remaining letters of alphabet into list
@@ -89,8 +93,8 @@ class Keyword(Cipher):
         """ Decrypts user-defined message using the Keyword cipher."""
         for letter in self.keyword:
             # letter by letter places non-repeated letters of keyword into list
-            if letter.lower() in self.alphabet \
-                    and letter.lower() not in self.alphabet_modified:
+            if (letter.lower() in self.alphabet
+                    and letter.lower() not in self.alphabet_modified):
                 self.alphabet_modified.append(letter)
         for letter in self.alphabet:
             # places non-repeated remaining letters of alphabet into list
@@ -115,45 +119,39 @@ class PolybiusSquare(Cipher):
     def __init__(self):
         """ Initializes an instance of the PolybiusSquare class."""
         super().__init__()
+        rows = list(range(1, 6))
+        cols = list(range(1, 6))
+        # creates list of number pairs used as coordinate index
+        self.coordinates = [(str(x) + str(y)) for x in rows for y in cols]
+        # alphabet_modified contains letters 'i' and 'j' on same index value
+        self.alphabet_modified = list(string.ascii_lowercase)
+        self.alphabet_modified.remove('i')
+        self.alphabet_modified.remove('j')
+        self.alphabet_modified.insert(8, '(i/j)')
+        self.output = []
 
     def encrypt(self, string):
         """ Encrypts user-defined message using the Polybius Square cipher."""
-        rows = list(range(1, 6))
-        cols = list(range(1, 6))
-        # creates list of number pairs used as coordinate index
-        coordinates = [(str(x) + str(y)) for x in rows for y in cols]
-        alphabet_modified = list('abcdefghklmnopqrstuvwxyz')
-        alphabet_modified.insert(8, 'i/j')
-        # alphabet_modified contains letters 'i' and 'j' on same index value
         # creates dict with letters as keys and corresponding coordinates
         alphabet_lookup = {letter: number for letter, number
-                           in zip(alphabet_modified, coordinates)}
-        output = []
+                           in zip(self.alphabet_modified, self.coordinates)}
         for letter in string:
             if letter.lower() == 'i' or letter.lower() == 'j':
-                output.append('24')
+                self.output.append('24')
             elif letter == ' ':
                 continue
             else:
-                output.append(str(alphabet_lookup.get(letter.lower())))
-        return ' '.join(output)
+                self.output.append(str(alphabet_lookup.get(letter.lower())))
+        return ' '.join(self.output)
 
     def decrypt(self, string):
         """ Decrypts user-defined message using the Polybius Square cipher."""
-        rows = list(range(1, 6))
-        cols = list(range(1, 6))
-        # creates list of number pairs used as coordinate index
-        coordinates = [(str(x) + str(y)) for x in rows for y in cols]
-        # alphabet_modified contains letters 'i' and 'j' on same index value
-        alphabet_modified = list('abcdefghklmnopqrstuvwxyz')
-        alphabet_modified.insert(8, '(i/j)')
         # creates dict with letters as keys and corresponding coordinates
         alphabet_lookup = {number: letter for letter, number
-                           in zip(alphabet_modified, coordinates)}
-        output = []
+                           in zip(self.alphabet_modified, self.coordinates)}
         for number_pair in string:
             if number_pair not in alphabet_lookup.keys():
-                output.append(number_pair)
+                self.output.append(number_pair)
             else:
-                output.append(alphabet_lookup.get(number_pair))
-        return ''.join(output)
+                self.output.append(alphabet_lookup.get(number_pair))
+        return ''.join(self.output)
